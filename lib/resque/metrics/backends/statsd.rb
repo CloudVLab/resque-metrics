@@ -27,9 +27,9 @@ module Resque
                   end
             case time_or_count
             when 'time'
-              statsd.timing key, by
+              statsd.timing key, {:sample_rate => by}
             when 'count'
-              statsd.increment key, by
+              statsd.increment key, {:sample_rate => by}
             else
               raise "Not sure how to increment_metric for a #{time_or_count} metric (#{metric})"
             end
@@ -42,7 +42,7 @@ module Resque
                   else
                     "#{metric_prefix}.payload_size.#{time_or_count}"
                   end
-            statsd.increment key, by
+            statsd.increment key, {:sample_rate => by}
           else
             raise "Not sure how to increment_metric #{metric}"
           end

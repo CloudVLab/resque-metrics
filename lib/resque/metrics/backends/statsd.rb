@@ -27,9 +27,9 @@ module Resque
                   end
             case time_or_count
             when 'time'
-              statsd.timing key, {:sample_rate => by}
+              statsd.timing(key, by)
             when 'count'
-              statsd.increment key, {:sample_rate => by}
+              statsd.increment(key) # increment is always by just 1
             else
               raise "Not sure how to increment_metric for a #{time_or_count} metric (#{metric})"
             end
@@ -42,7 +42,7 @@ module Resque
                   else
                     "#{metric_prefix}.payload_size.#{time_or_count}"
                   end
-            statsd.increment key, {:sample_rate => by}
+            statsd.histogram(key, by)
           else
             raise "Not sure how to increment_metric #{metric}"
           end
@@ -51,16 +51,15 @@ module Resque
         def set_metric(metric, val)
           if metric =~ /^depth(?::(failed|pending|queue)(?::(.+))?)?$/
             key = "#{metric_prefix}.#{metric.gsub(':', '.')}"
-            statsd.gauge key, val
+            statsd.gauge(key, val)
           else
             raise "Not sure how to set_metric #{metric}"
           end
         end
-        
+
         # set_avg: let statsd & graphite handle that
         # get_metric: would have to talk to graphite. but man, complicated
       end
     end
   end
 end
-
